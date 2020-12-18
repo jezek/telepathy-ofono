@@ -472,6 +472,7 @@ void oFonoTextChannel::messageReceived(const QString &message, uint handle, cons
 
 void oFonoTextChannel::mmsReceived(const QString &id, uint handle, const QVariantMap &properties)
 {
+    qDebug() << "jezek - oFonoTextChannel::mmsReceived";
     Tp::MessagePartList message;
     QString subject = properties["Subject"].toString();
     QString smil = properties["Smil"].toString();
@@ -486,6 +487,11 @@ void oFonoTextChannel::mmsReceived(const QString &id, uint handle, const QVarian
     if (!subject.isEmpty())
     {
         header["subject"] = QDBusVariant(subject);
+    }
+    qDebug() << "jezek - oFonoTextChannel::mmsReceived - " << properties["Error"].toString();
+    if (!properties["Error"].toString().isEmpty())
+    {
+        header["x-ubports-error"] = QDBusVariant("error");
     }
     message << header;
     IncomingAttachmentList mmsdAttachments = qdbus_cast<IncomingAttachmentList>(properties["Attachments"]);
