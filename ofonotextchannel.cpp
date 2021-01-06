@@ -482,6 +482,9 @@ void oFonoTextChannel::mmsReceived(const QString &id, uint handle, const QVarian
     header["message-sender"] = QDBusVariant(handle);
     header["message-received"] = QDBusVariant(QDateTime::currentDateTimeUtc().toTime_t());
     header["message-sent"] = QDBusVariant(getSentDate(properties["Date"].toString()).toTime_t());
+    //TODO:jezek - Why is here Tp::DeliveryStatusDelivered? Shouldn't it be Tp::ChannelTextMessageTypeNormal?
+    qDebug() << "jezek - Tp::DeliveryStatusDelivered: " << Tp::DeliveryStatusDelivered;
+    qDebug() << "jezek - Tp::ChannelTextMessageTypeNormal: " << Tp::ChannelTextMessageTypeNormal;
     header["message-type"] = QDBusVariant(Tp::DeliveryStatusDelivered);
     header["x-canonical-mms"] = QDBusVariant(true);
     if (!subject.isEmpty())
@@ -494,6 +497,7 @@ void oFonoTextChannel::mmsReceived(const QString &id, uint handle, const QVarian
         //TODO:jezek - change delivery-status, delivery-error, delivery-error-message?, 
         //TODO:jezek - should carry some error insights
         header["x-ubports-error"] = QDBusVariant("error");
+        header["delivery-status"] = QDBusVariant(Tp::DeliveryStatusTemporarilyFailed);
     }
     qDebug() << "jezek - oFonoTextChannel::mmsReceived - DeleteEvent:" << properties["DeleteEvent"].toString();
     if (!properties["DeleteEvent"].toString().isEmpty())
