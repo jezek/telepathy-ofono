@@ -487,21 +487,22 @@ void oFonoTextChannel::mmsReceived(const QString &id, uint handle, const QVarian
     qDebug() << "jezek - Tp::ChannelTextMessageTypeNormal: " << Tp::ChannelTextMessageTypeNormal;
     header["message-type"] = QDBusVariant(Tp::DeliveryStatusDelivered);
     header["x-canonical-mms"] = QDBusVariant(true);
-    if (!subject.isEmpty())
-    {
+    if (!subject.isEmpty()) {
         header["subject"] = QDBusVariant(subject);
     }
-    qDebug() << "jezek - oFonoTextChannel::mmsReceived - Error: " << properties["Error"].toString();
-    if (!properties["Error"].toString().isEmpty())
-    {
-        //TODO:jezek - change delivery-status, delivery-error, delivery-error-message?, 
-        //TODO:jezek - should carry some error insights
-        header["x-ubports-error"] = QDBusVariant("error");
-        header["delivery-status"] = QDBusVariant(Tp::DeliveryStatusTemporarilyFailed);
+    qDebug() << "jezek - oFonoTextChannel::mmsReceived - Error: " << properties["Error"].toBool();
+    if (properties["Error"].toBool() == true) {
+        header["delivery-status"] = QDBusVariant(Tp::DeliveryStatusPermanentlyFailed);
+        qDebug() << "jezek - oFonoTextChannel::mmsReceived - header[delivery-status]: " << Tp::DeliveryStatusPermanentlyFailed;
+        if (properties["AllowRedownload"].toBool() == true) {
+            header["delivery-status"] = QDBusVariant(Tp::DeliveryStatusTemporarilyFailed);
+            qDebug() << "jezek - oFonoTextChannel::mmsReceived - header[delivery-status]: " << Tp::DeliveryStatusTemporarilyFailed;
+        }
+        header["delivery-error-message"] = QDBusVariant(properties["ErrorMessage"].toString());
+        qDebug() << "jezek - oFonoTextChannel::mmsReceived - header[delivery-error-message]: " << properties["ErrorMessage"].toString();
     }
     qDebug() << "jezek - oFonoTextChannel::mmsReceived - DeleteEvent:" << properties["DeleteEvent"].toString();
-    if (!properties["DeleteEvent"].toString().isEmpty())
-    {
+    if (!properties["DeleteEvent"].toString().isEmpty()) {
         header["supersedes"] = QDBusVariant(properties["DeleteEvent"].toString());
     }
     message << header;
