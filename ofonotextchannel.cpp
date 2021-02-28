@@ -481,6 +481,10 @@ void oFonoTextChannel::mmsReceived(const QString &id, uint handle, const QVarian
     header["message-token"] = QDBusVariant(id);
     header["message-sender"] = QDBusVariant(handle);
     header["message-received"] = QDBusVariant(QDateTime::currentDateTimeUtc().toTime_t());
+    if (properties["Received"].isNull() == false && properties["Received"].toUInt() > 0) {
+      header["message-received"] = QDBusVariant(properties["Received"].toUInt());
+      qDebug() << "jezek - oFonoTextChannel::mmsReceived - header[message-received]: " << properties["Received"].toUInt();
+    }
     header["message-sent"] = QDBusVariant(getSentDate(properties["Date"].toString()).toTime_t());
     //TODO:jezek - Why is here Tp::DeliveryStatusDelivered? Shouldn't it be Tp::ChannelTextMessageTypeNormal?
     qDebug() << "jezek - Tp::DeliveryStatusDelivered: " << Tp::DeliveryStatusDelivered;
@@ -491,15 +495,15 @@ void oFonoTextChannel::mmsReceived(const QString &id, uint handle, const QVarian
         header["subject"] = QDBusVariant(subject);
     }
     qDebug() << "jezek - oFonoTextChannel::mmsReceived - Error: " << properties["Error"].toBool();
-    if (properties["Error"].toBool() == true) {
+    if (properties["Error"].isNull() == false) {
         header["delivery-status"] = QDBusVariant(Tp::DeliveryStatusPermanentlyFailed);
         qDebug() << "jezek - oFonoTextChannel::mmsReceived - header[delivery-status]: " << Tp::DeliveryStatusPermanentlyFailed;
         if (properties["AllowRedownload"].toBool() == true) {
             header["delivery-status"] = QDBusVariant(Tp::DeliveryStatusTemporarilyFailed);
             qDebug() << "jezek - oFonoTextChannel::mmsReceived - header[delivery-status]: " << Tp::DeliveryStatusTemporarilyFailed;
         }
-        header["delivery-error-message"] = QDBusVariant(properties["ErrorMessage"].toString());
-        qDebug() << "jezek - oFonoTextChannel::mmsReceived - header[delivery-error-message]: " << properties["ErrorMessage"].toString();
+        header["delivery-error-message"] = QDBusVariant(properties["Error"].toString());
+        qDebug() << "jezek - oFonoTextChannel::mmsReceived - header[delivery-error-message]: " << properties["Error"].toString();
     }
     qDebug() << "jezek - oFonoTextChannel::mmsReceived - DeleteEvent:" << properties["DeleteEvent"].toString();
     if (!properties["DeleteEvent"].toString().isEmpty()) {
