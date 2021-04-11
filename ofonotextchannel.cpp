@@ -486,10 +486,7 @@ void oFonoTextChannel::mmsReceived(const QString &id, uint handle, const QVarian
       qDebug() << "jezek - oFonoTextChannel::mmsReceived - header[message-received]: " << properties["Received"].toUInt();
     }
     header["message-sent"] = QDBusVariant(getSentDate(properties["Date"].toString()).toTime_t());
-    //TODO:jezek - Why is here Tp::DeliveryStatusDelivered? Shouldn't it be Tp::ChannelTextMessageTypeNormal?
-    qDebug() << "jezek - Tp::DeliveryStatusDelivered: " << Tp::DeliveryStatusDelivered;
-    qDebug() << "jezek - Tp::ChannelTextMessageTypeNormal: " << Tp::ChannelTextMessageTypeNormal;
-    header["message-type"] = QDBusVariant(Tp::DeliveryStatusDelivered);
+    header["message-type"] = QDBusVariant(Tp::ChannelTextMessageTypeNormal);
     header["x-canonical-mms"] = QDBusVariant(true);
     if (!subject.isEmpty()) {
         header["subject"] = QDBusVariant(subject);
