@@ -491,6 +491,14 @@ void oFonoTextChannel::mmsReceived(const QString &id, uint handle, const QVarian
     if (!subject.isEmpty()) {
         header["subject"] = QDBusVariant(subject);
     }
+    qDebug() << "jezek - oFonoTextChannel::mmsReceived - Rescued: " << properties["Rescued"].toBool();
+    if (properties["Rescued"].isNull() == false && properties["Rescued"].toBool() == true) {
+      header["rescued"] = QDBusVariant(true);
+    }
+    qDebug() << "jezek - oFonoTextChannel::mmsReceived - Silent: " << properties["Silent"].toBool();
+    if (properties["Silent"].isNull() == false && properties["Silent"].toBool() == true) {
+      header["silent"] = QDBusVariant(true);
+    }
     qDebug() << "jezek - oFonoTextChannel::mmsReceived - Error: " << properties["Error"].toBool();
     if (properties["Error"].isNull() == false) {
         header["delivery-status"] = QDBusVariant(Tp::DeliveryStatusPermanentlyFailed);
