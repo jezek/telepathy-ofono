@@ -472,7 +472,6 @@ void oFonoTextChannel::messageReceived(const QString &message, uint handle, cons
 
 void oFonoTextChannel::mmsReceived(const QString &id, uint handle, const QVariantMap &properties)
 {
-    qDebug() << "jezek - oFonoTextChannel::mmsReceived - id: " << id;
     Tp::MessagePartList message;
     QString subject = properties["Subject"].toString();
     QString smil = properties["Smil"].toString();
@@ -483,7 +482,6 @@ void oFonoTextChannel::mmsReceived(const QString &id, uint handle, const QVarian
     header["message-received"] = QDBusVariant(QDateTime::currentDateTimeUtc().toTime_t());
     if (properties["Received"].isNull() == false && properties["Received"].toUInt() > 0) {
       header["message-received"] = QDBusVariant(properties["Received"].toUInt());
-      qDebug() << "jezek - oFonoTextChannel::mmsReceived - header[message-received]: " << properties["Received"].toUInt();
     }
     header["message-sent"] = QDBusVariant(getSentDate(properties["Date"].toString()).toTime_t());
     header["message-type"] = QDBusVariant(Tp::ChannelTextMessageTypeNormal);
@@ -491,26 +489,19 @@ void oFonoTextChannel::mmsReceived(const QString &id, uint handle, const QVarian
     if (!subject.isEmpty()) {
         header["subject"] = QDBusVariant(subject);
     }
-    qDebug() << "jezek - oFonoTextChannel::mmsReceived - Rescued: " << properties["Rescued"].toBool();
     if (properties["Rescued"].isNull() == false && properties["Rescued"].toBool() == true) {
       header["rescued"] = QDBusVariant(true);
     }
-    qDebug() << "jezek - oFonoTextChannel::mmsReceived - Silent: " << properties["Silent"].toBool();
     if (properties["Silent"].isNull() == false && properties["Silent"].toBool() == true) {
       header["silent"] = QDBusVariant(true);
     }
-    qDebug() << "jezek - oFonoTextChannel::mmsReceived - Error: " << properties["Error"].toBool();
     if (properties["Error"].isNull() == false) {
         header["delivery-status"] = QDBusVariant(Tp::DeliveryStatusPermanentlyFailed);
-        qDebug() << "jezek - oFonoTextChannel::mmsReceived - header[delivery-status]: " << Tp::DeliveryStatusPermanentlyFailed;
         if (properties["AllowRedownload"].toBool() == true) {
             header["delivery-status"] = QDBusVariant(Tp::DeliveryStatusTemporarilyFailed);
-            qDebug() << "jezek - oFonoTextChannel::mmsReceived - header[delivery-status]: " << Tp::DeliveryStatusTemporarilyFailed;
         }
         header["delivery-error-message"] = QDBusVariant(properties["Error"].toString());
-        qDebug() << "jezek - oFonoTextChannel::mmsReceived - header[delivery-error-message]: " << properties["Error"].toString();
     }
-    qDebug() << "jezek - oFonoTextChannel::mmsReceived - DeleteEvent:" << properties["DeleteEvent"].toString();
     if (!properties["DeleteEvent"].toString().isEmpty()) {
         header["supersedes"] = QDBusVariant(properties["DeleteEvent"].toString());
     }
